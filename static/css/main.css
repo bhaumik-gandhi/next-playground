@@ -1,0 +1,111 @@
+/* .react-datepicker__time-container {
+  float: right;
+  border-left: 1px solid #aeaeae;
+  width: 115px;
+}
+
+.react-datepicker__time-container
+  .react-datepicker__time
+  .react-datepicker__time-box {
+  width: 115px;
+  overflow-x: hidden;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid #eee;
+}
+
+.grid-header-container {
+  display: flex;
+}
+
+.grid-header {
+  padding: 15px;
+  border: 1px solid #eee;
+}
+
+.action-btn {
+  padding: 15px;
+}
+
+.form-input { 
+  padding: 0 10px;
+  height: 38px;
+}
+
+.w-30 {
+  width: 30%;
+}
+
+.form-container {
+  display: flex;
+} */
+
+.main-container {
+  display: flex;
+  justify-content: center;
+}
+
+.main-container {
+  display: flex;
+  justify-content: center;
+}
+
+.form-container {
+  width: 500px;
+  margin: 15px;
+  padding: 15px;
+}
+
+.input-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.form-input {
+  height: 38px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #eee;
+  padding: 0 10px;
+  margin: 15px 0;
+}
+
+.date-picker-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-btn {
+  cursor: pointer;
+    height: 38px;
+    background-color: #0085ff;
+    border-radius: 5px;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.grid-header-container {
+  display: flex;
+}
+
+.grid-header {
+  padding: 15px 5px;
+  width: 30%;
+  border: 1px solid #eee;
+}
+
+.list-container {
+  margin: 15px;
+  padding: 15px;
+  width: 800px;
+}
