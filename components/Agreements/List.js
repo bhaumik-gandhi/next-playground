@@ -1,36 +1,24 @@
 import Link from 'next/link'
+import AgreementService from '../../libs/AgreementService';
 
 export default class Create extends React.Component {
 
   constructor() {
     super();
     this.state={
-      data: [{
-        name: 'abc asdad asd',
-        start_date: '15-06-2018',
-        end_date: '15-1-2325',
-        value: 5,
-        status: 'Active'
-      },{
-        name: 'abc asdad asd',
-        start_date: '15-06-2018',
-        end_date: '15-1-2325',
-        value: 5,
-        status: 'Active'
-      },{
-        name: 'abc asdad asd',
-        start_date: '15-06-2018',
-        end_date: '15-1-2325',
-        value: 5,
-        status: 'Active'
-      },{
-        name: 'abc asdad asd',
-        start_date: '15-06-2018',
-        end_date: '15-1-2325',
-        value: 5,
-        status: 'Active'
-      }]
-    }
+      data: []
+    },
+    this.fields = ['name','startDate', 'endDate', 'value', 'status'];
+  }
+
+  componentDidMount() {
+    AgreementService.get()
+      .then(res => {
+        console.log(res);
+        this.setState({
+          data: res.data
+        })
+      })
   }
 
   render() {
@@ -40,6 +28,19 @@ export default class Create extends React.Component {
             <Link href="/create">
               <a style={{fontSize: '18px'}}>Create</a>
             </Link>
+        </div>
+
+        <div className="advance-search-container">
+          <div>
+          <select
+            name="status"
+            onChange={e => this.updateData(e)}
+            className="form-input"
+            style={{ backgroundColor: "#fff", width: "17%" }}
+          >
+            {this.fields.map(field => <option key={field}>{field.toUpperCase()}</option>)}
+          </select>
+          </div>
         </div>
         
         <div className='grid-header-container'>
@@ -51,8 +52,8 @@ export default class Create extends React.Component {
           <div className='grid-header'>Actions</div>
         </div>
 
-        {this.state.data.map(agrmnt => (
-          <div className='grid-header-container'>               
+        {this.state.data.map((agrmnt, index) => (
+          <div className='grid-header-container' key={index}>               
               <div className='grid-header'>{agrmnt.name}</div>
               <div className='grid-header'>{agrmnt.start_date}</div>
               <div className='grid-header'>{agrmnt.end_date}</div>

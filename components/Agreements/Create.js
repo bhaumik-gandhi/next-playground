@@ -1,9 +1,8 @@
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import axios from "axios";
-import { SERVER_URL } from "../../config/env";
 import Link from 'next/link'
 import Router from 'next/router';
+import AgreementService from '../../libs/AgreementService';
 
 export default class Create extends React.Component {
   constructor() {
@@ -11,10 +10,10 @@ export default class Create extends React.Component {
     this.state = {
       form: {
         name: "",
-        start_date: "",
-        end_date: "",
+        startDate: "",
+        endDate: "",
         value: "",
-        status: ""
+        status: "Active"
       }
     };
     this.status = ["Active", "Renewed", "Amended"];
@@ -35,19 +34,13 @@ export default class Create extends React.Component {
   handleChange = (date, forDate) => {
     console.log(date.toDate(), forDate);
     this.updateData({
-      target: { name: forDate.toLowerCase(), value: date }
+      target: { name: forDate, value: date }
     });
   };
 
-  submit = () => {
-    console.log(this.state.form);
-    let config = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    axios
-      .post(SERVER_URL, this.state.form, config)
+  submit = () => {    
+    AgreementService
+      .create(this.state.form)
       .then(res => {
         console.log(res);
         Router.push('/');
@@ -74,8 +67,8 @@ export default class Create extends React.Component {
           />
           <div className="date-picker-container">
             <DatePicker
-              selected={this.state.form.start_date}
-              onChange={date => this.handleChange(date, "START_DATE")}
+              selected={this.state.form.startDate}
+              onChange={date => this.handleChange(date, "startDate")}
               showTimeSelect
               timeFormat="HH:mm"
               dateFormat="LLL"
@@ -84,8 +77,8 @@ export default class Create extends React.Component {
               className="form-input"
             />
             <DatePicker
-              selected={this.state.form.end_date}
-              onChange={date => this.handleChange(date, "END_DATE")}
+              selected={this.state.form.endDate}
+              onChange={date => this.handleChange(date, "endDate")}
               showTimeSelect
               timeFormat="HH:mm"
               dateFormat="LLL"
