@@ -30,10 +30,23 @@ export default class AgreementService {
     })
   }
 
-  static filter = () => {
-    console.log("SERVICE");
+  static delete = (ids) => {
+    console.log("DELETE SERVICE");
     return new Promise((resolve, reject) => {
-      axios.get(SERVER_URL)
+      axios.post(SERVER_URL + 'delete', ids)
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err);
+        })
+    })
+  }
+
+  static filter = (data) => {
+    console.log("DELETE SERVICE");
+    return new Promise((resolve, reject) => {
+      axios.post(SERVER_URL + 'filter', data)
         .then(res => {
           resolve(res);
         })

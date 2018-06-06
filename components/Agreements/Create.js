@@ -1,8 +1,9 @@
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import Link from 'next/link'
-import Router from 'next/router';
-import AgreementService from '../../libs/AgreementService';
+import Link from "next/link";
+import Router from "next/router";
+import AgreementService from "../../libs/AgreementService";
+import { get } from "lodash";
 
 export default class Create extends React.Component {
   constructor() {
@@ -14,39 +15,167 @@ export default class Create extends React.Component {
         endDate: "",
         value: "",
         status: "Active"
+      },
+      errors: {
+        name: {
+          isRequired: true,
+          isRequiredError: false
+        },
+        startDate: {
+          isRequired: true,
+          isRequiredError: false
+        },
+        endDate: {
+          isRequired: true,
+          isRequiredError: false
+        },
+        value: {
+          isRequired: true,
+          isRequiredError: false
+        },
+        status: {
+          isRequired: true,
+          isRequiredError: false
+        }
       }
     };
+    this.formSubmitted = false;
     this.status = ["Active", "Renewed", "Amended"];
   }
+
+  checkIsFormValid = () => {
+    let requiredFields = [];
+    let nonRequiredFields = [];
+    let allFields = Object.keys(this.state.errors);
+
+    allFields.map(f => {
+      if (this.state.errors[f].isRequired) {
+        requiredFields.push(f);
+      } else {
+        nonRequiredFields.push(f);
+      }
+    });
+    let isFormValid = true;
+
+    requiredFields.map(rf => {
+      if (!this.state.form[rf]) {
+        isFormValid = false;
+      }
+    });
+
+    nonRequiredFields.map(nrf => {});
+
+    this.setError(allFields);
+
+    return isFormValid;
+  };
+
+  setError = field => {
+    if (Array.isArray(field)) {
+      let errors = this.state.errors;
+
+      field.map(f => {
+        let isRequired = get(this.state.errors[f], "isRequired");
+        let value = get(this.state.form, `${f}`);
+        if (isRequired) {
+          if (!value) {
+            errors[f].isRequiredError = true;
+          } else {
+            errors[f].isRequiredError = false;
+          }
+        }
+      });
+
+      this.setState({
+        errors
+      });
+    } else {
+      let isRequired = get(this.state.errors[field], "isRequired");
+      let value = get(this.state.form, field);
+
+      if (isRequired) {
+        if (!value) {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              [field]: {
+                ...this.state.errors[field],
+                isRequiredError: true
+              }
+            }
+          });
+        } else {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              [field]: {
+                ...this.state.errors[field],
+                isRequiredError: false
+              }
+            }
+          });
+        }
+      } else {
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            [field]: {
+              ...this.state.errors[field]
+            }
+          }
+        });
+      }
+    }
+  };
 
   updateData = e => {
     let name = e.target.name;
     let value = e.target.value;
     console.log(name, value);
-    this.setState({
-      form: {
-        ...this.state.form,
-        [name]: value
+    if (name==='value') {
+      value=parseInt(value);
+    }
+    this.setState(
+      {
+        form: {
+          ...this.state.form,
+          [name]: value
+        }
+      },
+      () => {
+        this.setError(name);
       }
-    });
+    );
   };
 
   handleChange = (date, forDate) => {
-    console.log(date.toDate(), forDate);
+    console.log(forDate);
     this.updateData({
       target: { name: forDate, value: date }
     });
   };
 
-  submit = () => {    
-    AgreementService
-      .create(this.state.form)
+  submit = () => {
+    if (this.formSubmitted) {
+      console.error("Form already submitted...");
+      return;
+    }
+
+    this.formSubmitted = true;
+
+    if (!this.checkIsFormValid()) {
+      console.error("FORM NOT VALID");
+      this.formSubmitted = false;
+      return;
+    }
+    AgreementService.create(this.state.form)
       .then(res => {
         console.log(res);
-        Router.push('/');
+        Router.push("/");
       })
       .catch(err => {
         console.error(err);
+        this.formSubmitted = false;
       });
   };
 
@@ -54,9 +183,9 @@ export default class Create extends React.Component {
     return (
       <div className="form-container">
         <div>
-            <Link href="/">
-              <a style={{fontSize: '18px'}}>Back to List</a>
-            </Link>
+          <Link href="/">
+            <a style={{ fontSize: "18px" }}>Back to List</a>
+          </Link>
         </div>
         <div className="input-container">
           <input
@@ -64,28 +193,50 @@ export default class Create extends React.Component {
             placeholder="Agreement Name"
             name="name"
             onChange={e => this.updateData(e)}
+            onBlur={() => this.setError("name")}
           />
+          {this.state.errors.name.isRequiredError ? (
+            <div className="validation-err-msg">
+              Agreement Name cannot be left blank
+            </div>
+          ) : null}
           <div className="date-picker-container">
-            <DatePicker
-              selected={this.state.form.startDate}
-              onChange={date => this.handleChange(date, "startDate")}
-              showTimeSelect
-              timeFormat="HH:mm"
-              dateFormat="LLL"
-              timeCaption="time"
-              placeholderText="Start Date"
-              className="form-input"
-            />
-            <DatePicker
-              selected={this.state.form.endDate}
-              onChange={date => this.handleChange(date, "endDate")}
-              showTimeSelect
-              timeFormat="HH:mm"
-              dateFormat="LLL"
-              timeCaption="time"
-              placeholderText="End Date"
-              className="form-input"
-            />
+            <div>
+              <DatePicker
+                selected={this.state.form.startDate}
+                onChange={date => this.handleChange(date, "startDate")}
+                showTimeSelect
+                timeFormat="HH:mm"
+                dateFormat="LLL"
+                timeCaption="time"
+                placeholderText="Start Date"
+                className="form-input"
+                onBlur={() => this.setError("startDate")}
+              />
+              {this.state.errors.startDate.isRequiredError ? (
+                <div className="validation-err-msg">
+                  Start Date cannot be left blank
+                </div>
+              ) : null}
+            </div>
+            <div>
+              <DatePicker
+                selected={this.state.form.endDate}
+                onChange={date => this.handleChange(date, "endDate")}
+                showTimeSelect
+                timeFormat="HH:mm"
+                dateFormat="LLL"
+                timeCaption="time"
+                placeholderText="End Date"
+                className="form-input"
+                onBlur={() => this.setError("endDate")}
+              />
+              {this.state.errors.endDate.isRequiredError ? (
+                <div className="validation-err-msg">
+                  End Date cannot be left blank
+                </div>
+              ) : null}
+            </div>
           </div>
           <input
             className="form-input"
@@ -93,15 +244,27 @@ export default class Create extends React.Component {
             placeholder="Agreement Value"
             name="value"
             onChange={e => this.updateData(e)}
+            onBlur={() => this.setError("value")}
           />
+          {this.state.errors.value.isRequiredError ? (
+            <div className="validation-err-msg">
+              Value cannot be left blank
+            </div>
+          ) : null}
           <select
             name="status"
             onChange={e => this.updateData(e)}
             className="form-input"
             style={{ backgroundColor: "#fff" }}
+            onBlur={() => this.setError("status")}
           >
             {this.status.map(status => <option key={status}>{status}</option>)}
           </select>
+          {this.state.errors.status.isRequiredError ? (
+            <div className="validation-err-msg">
+              Status cannot be left blank
+            </div>
+          ) : null}
           <button onClick={this.submit} className="form-btn">
             Create Agreement
           </button>
