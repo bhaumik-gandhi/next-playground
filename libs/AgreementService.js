@@ -56,4 +56,17 @@ export default class AgreementService {
     })
   }
 
+  static edit = (data) => {
+    console.log("Edit SERVICE");
+    return new Promise((resolve, reject) => {
+      axios.post(SERVER_URL + 'edit', data)
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err);
+        })
+    })
+  }
+
 }

@@ -113,3 +113,26 @@
   text-align: center;
   border: 1px solid #eee;
 }
+
+.filter-search {
+  padding: 15px 0;
+  font-size: 18px;
+  color: #1870ea;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.create-btn-link {
+  justify-content: flex-end;
+  display: flex;
+}
+
+.btn-lnk {
+  text-decoration: none;
+  color: #589eff;
+  font-size: 18px;
+  font-weight: 600;
+  border: 1px solid #589eff;
+  padding: 10px;
+  border-radius: 5px;
+}

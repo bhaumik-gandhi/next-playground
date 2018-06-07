@@ -10,9 +10,10 @@ app
   .then(() => {
     const server = express();
 
-    server.get("/p/:id", (req, res) => {
-      const actualPage = "/post";
+    server.get("/edit/:id", (req, res) => {
+      const actualPage = "/edit";
       const queryParams = { id: req.params.id };
+      console.log(queryParams);
       app.render(req, res, actualPage, queryParams);
     });
 

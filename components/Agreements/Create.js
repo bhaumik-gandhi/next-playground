@@ -6,8 +6,8 @@ import AgreementService from "../../libs/AgreementService";
 import { get } from "lodash";
 
 export default class Create extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       form: {
         name: "",
@@ -42,6 +42,33 @@ export default class Create extends React.Component {
     };
     this.formSubmitted = false;
     this.status = ["Active", "Renewed", "Amended"];
+  }
+
+  componentDidMount() {
+    if (this.props.id) {
+      console.log("EDIT", this.props.id);
+      this.getAgreement(this.props.id);
+    }
+  }
+
+  getAgreement = (id) => {
+    AgreementService.filter({id: id})
+      .then(res => {
+        console.log(res);
+        this.setState({
+          form: {
+            ...this.state.form,
+            name: res.data[0].name,
+            startDate: moment(res.data[0].startDate),
+            endDate: moment(res.data[0].endDate),
+            value: res.data[0].value,
+            status: res.data[0].status
+          }
+        })
+      })
+      .catch(err => {
+        console.error(err);
+      });
   }
 
   checkIsFormValid = () => {
@@ -193,7 +220,14 @@ export default class Create extends React.Component {
       startDate: moment(this.state.form.startDate).valueOf(),
       endDate: moment(this.state.form.endDate).valueOf()
     };
-    AgreementService.create(obj)
+    let promise = '';
+    if (this.props.id) {
+      obj.id = this.props.id;
+      promise = AgreementService.edit(obj);
+    } else {
+      promise = AgreementService.create(obj);
+    };
+    promise
       .then(res => {
         console.log(res);
         Router.push("/");
@@ -202,14 +236,14 @@ export default class Create extends React.Component {
         console.error(err);
         this.formSubmitted = false;
       });
-  };
+    }
 
   render() {
     return (
       <div className="form-container">
-        <div>
+        <div className='create-btn-link'>
           <Link href="/">
-            <a style={{ fontSize: "18px" }}>Back to List</a>
+            <a className='btn-lnk'>{`Back to List`}</a>
           </Link>
         </div>
         <div className="input-container">
@@ -219,6 +253,7 @@ export default class Create extends React.Component {
             name="name"
             onChange={e => this.updateData(e)}
             onBlur={() => this.setError("name")}
+            value={this.state.form.name}
           />
           {this.state.errors.name.isRequiredError ? (
             <div className="validation-err-msg">
@@ -275,6 +310,7 @@ export default class Create extends React.Component {
             name="value"
             onChange={e => this.updateData(e)}
             onBlur={() => this.setError("value")}
+            value={this.state.form.value}
           />
           {this.state.errors.value.isRequiredError ? (
             <div className="validation-err-msg">Value cannot be left blank</div>
@@ -285,6 +321,7 @@ export default class Create extends React.Component {
             className="form-input"
             style={{ backgroundColor: "#fff" }}
             onBlur={() => this.setError("status")}
+            value={this.state.form.status}
           >
             {this.status.map(status => <option key={status}>{status}</option>)}
           </select>
