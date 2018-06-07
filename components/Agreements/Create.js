@@ -27,7 +27,8 @@ export default class Create extends React.Component {
         },
         endDate: {
           isRequired: true,
-          isRequiredError: false
+          isRequiredError: false,
+          isValidDateError: false
         },
         value: {
           isRequired: true,
@@ -60,6 +61,13 @@ export default class Create extends React.Component {
     requiredFields.map(rf => {
       if (!this.state.form[rf]) {
         isFormValid = false;
+      }
+      if (rf === 'endDate') {
+        let startDate = this.state.form.startDate.valueOf();
+        let endDate = this.state.form.endDate.valueOf();
+        if (startDate >= endDate) {
+          isFormValid = false;
+        }
       }
     });
 
@@ -105,12 +113,24 @@ export default class Create extends React.Component {
             }
           });
         } else {
+          let isValidDateError=``;
+          if (field === 'endDate') {
+            let startDate = this.state.form.startDate.valueOf();
+            let endDate = this.state.form.endDate.valueOf();
+            if (startDate >= endDate) {
+              isValidDateError = {isValidDateError: true}
+            } else {
+              isValidDateError = {isValidDateError: false}
+            }
+          }
+
           this.setState({
             errors: {
               ...this.state.errors,
               [field]: {
                 ...this.state.errors[field],
-                isRequiredError: false
+                isRequiredError: false,
+                ...isValidDateError
               }
             }
           });
@@ -132,8 +152,8 @@ export default class Create extends React.Component {
     let name = e.target.name;
     let value = e.target.value;
     console.log(name, value);
-    if (name==='value') {
-      value=parseInt(value);
+    if (name === "value") {
+      value = parseInt(value);
     }
     this.setState(
       {
@@ -168,7 +188,12 @@ export default class Create extends React.Component {
       this.formSubmitted = false;
       return;
     }
-    AgreementService.create(this.state.form)
+    let obj = {
+      ...this.state.form,
+      startDate: moment(this.state.form.startDate).valueOf(),
+      endDate: moment(this.state.form.endDate).valueOf()
+    };
+    AgreementService.create(obj)
       .then(res => {
         console.log(res);
         Router.push("/");
@@ -207,7 +232,7 @@ export default class Create extends React.Component {
                 onChange={date => this.handleChange(date, "startDate")}
                 showTimeSelect
                 timeFormat="HH:mm"
-                dateFormat="LLL"
+                dateFormat="DD MMM YYYY - HH:mm:ss A"
                 timeCaption="time"
                 placeholderText="Start Date"
                 className="form-input"
@@ -225,7 +250,7 @@ export default class Create extends React.Component {
                 onChange={date => this.handleChange(date, "endDate")}
                 showTimeSelect
                 timeFormat="HH:mm"
-                dateFormat="LLL"
+                dateFormat="DD MMM YYYY - HH:mm:ss A"
                 timeCaption="time"
                 placeholderText="End Date"
                 className="form-input"
@@ -234,6 +259,11 @@ export default class Create extends React.Component {
               {this.state.errors.endDate.isRequiredError ? (
                 <div className="validation-err-msg">
                   End Date cannot be left blank
+                </div>
+              ) : null}
+              {this.state.errors.endDate.isValidDateError ? (
+                <div className="validation-err-msg">
+                  End Date always greater than start date
                 </div>
               ) : null}
             </div>
@@ -247,9 +277,7 @@ export default class Create extends React.Component {
             onBlur={() => this.setError("value")}
           />
           {this.state.errors.value.isRequiredError ? (
-            <div className="validation-err-msg">
-              Value cannot be left blank
-            </div>
+            <div className="validation-err-msg">Value cannot be left blank</div>
           ) : null}
           <select
             name="status"

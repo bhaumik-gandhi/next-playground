@@ -5,7 +5,7 @@ const SERVER_URL = "http://localhost:1337/";
 export default class AgreementService {
 
   static get = () => {
-    console.log("SERVICE");
+    console.log("GET SERVICE");
     return new Promise((resolve, reject) => {
       axios.get(SERVER_URL)
         .then(res => {
@@ -18,7 +18,7 @@ export default class AgreementService {
   }
 
   static create = (data) => {
-    console.log("SERVICE");
+    console.log("Create SERVICE");
     return new Promise((resolve, reject) => {
       axios.post(SERVER_URL + 'create', data)
         .then(res => {
@@ -44,7 +44,7 @@ export default class AgreementService {
   }
 
   static filter = (data) => {
-    console.log("DELETE SERVICE");
+    console.log("Filter SERVICE");
     return new Promise((resolve, reject) => {
       axios.post(SERVER_URL + 'filter', data)
         .then(res => {

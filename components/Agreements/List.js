@@ -135,7 +135,7 @@ export default class Create extends React.Component {
             onChange={date => this.handleChange(date, "startDate")}
             showTimeSelect
             timeFormat="HH:mm"
-            dateFormat="LLL"
+            dateFormat="DD MMM YYYY - HH:mm:ss A"
             timeCaption="time"
             placeholderText="Start Date"
             className="form-input"
@@ -150,7 +150,7 @@ export default class Create extends React.Component {
             onChange={date => this.handleChange(date, "endDate")}
             showTimeSelect
             timeFormat="HH:mm"
-            dateFormat="LLL"
+            dateFormat="DD MMM YYYY - HH:mm:ss A"
             timeCaption="time"
             placeholderText="End Date"
             className="form-input"
@@ -176,7 +176,7 @@ export default class Create extends React.Component {
           className="form-input"
           style={{ backgroundColor: "#fff", width: "15%" }}
         >
-          {this.status.map(status => <option key={status}>{status}</option>)}
+          {this.status.map(status => <option key={status} value={status}>{status}</option>)}
         </select>
       );
     }
@@ -231,7 +231,11 @@ export default class Create extends React.Component {
       operation: this.state.selectedOperator,
       [this.state.selectedField]: this.state.form[this.state.selectedField]
     };
-
+    if (obj.startDate) {
+      obj.startDate = moment(obj.startDate).valueOf();
+    } else if (obj.endDate) {
+      obj.endDate = moment(obj.endDate).valueOf();
+    }
     AgreementService.filter(obj)
       .then(res => {
         this.setState({
@@ -358,7 +362,7 @@ export default class Create extends React.Component {
                   : "grid-header"
               }
             >
-              {agrmnt.start_date ? moment(agrmnt.start_date).format('DD MMM YYYY - HH:mm a'): '-'}
+              {agrmnt.startDate ? moment(agrmnt.startDate).format('DD MMM YYYY - HH:mm:ss A'): '-'}
             </div>
             <div
               className={
@@ -367,7 +371,7 @@ export default class Create extends React.Component {
                   : "grid-header"
               }
             >
-              {agrmnt.end_date ? moment(agrmnt.end_date).format('DD MMM YYYY - HH:mm a') : '-'}
+              {agrmnt.endDate ? moment(agrmnt.endDate).format('DD MMM YYYY - HH:mm:ss A') : '-'}
             </div>
             <div
               className={
